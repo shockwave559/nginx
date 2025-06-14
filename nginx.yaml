@@ -5,7 +5,7 @@ metadata:
   labels:
     app: nginx
 spec:
-  replicas: 3
+  replicas: 2
   selector:
     matchLabels:
       app: nginx
@@ -16,9 +16,22 @@ spec:
     spec:
       containers:
         - name: nginx
-          image: nginx:latest
+          image: progrium/stress
+          command: ["sh", "-c"]
+          args:
+            - |
+              nginx &
+              stress --cpu 1 --timeout 300s &
+              tail -f /dev/null
           ports:
             - containerPort: 80
+          resources:
+            requests:
+              cpu: "20m"
+              memory: "32Mi"
+            limits:
+              cpu: "100m"
+              memory: "64Mi"
 
 ---
 apiVersion: v1
@@ -33,7 +46,6 @@ spec:
     - protocol: TCP
       port: 8080
       targetPort: 80
-
 
 ---
 apiVersion: autoscaling/v2
@@ -53,4 +65,4 @@ spec:
         name: cpu
         target:
           type: Utilization
-          averageUtilization: 50
+          averageUtilization: 30
