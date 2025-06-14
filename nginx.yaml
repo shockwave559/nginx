@@ -16,13 +16,7 @@ spec:
     spec:
       containers:
         - name: nginx
-          image: progrium/stress
-          command: ["sh", "-c"]
-          args:
-            - |
-              nginx &
-              stress --cpu 1 --timeout 300s &
-              tail -f /dev/null
+          image: nginx:latest
           ports:
             - containerPort: 80
           resources:
